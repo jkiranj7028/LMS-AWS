@@ -1,0 +1,49 @@
+
+AWS LMS Engineer – Hands-on Guide (Moodle on AWS)
+
+Scope
+- Production-ready Moodle on AWS with Terraform + Docker.
+- ALB + Auto Scaling EC2, RDS MySQL, S3, optional CloudFront/Redis.
+
+Step 1: Networking
+- Create VPC 10.20.0.0/16 with 2 public + 2 private subnets.
+- Internet Gateway + public route table for ALB & NAT (if using private EC2).
+
+Step 2: Database
+- RDS MySQL (Multi-AZ). Backup retention: 7 days. Encrypt storage.
+
+Step 3: Storage
+- S3 bucket for filedir and backups. Block public access. Enable SSE.
+
+Step 4: Compute
+- Launch Template with Amazon Linux 2023, installs Docker, starts Moodle (Bitnami) and Nginx reverse proxy via docker compose.
+- Auto Scaling Group across public subnets (for simplicity). Prefer private subnets + NAT in real prod.
+
+Step 5: Load Balancing
+- Internet-facing ALB -> Target Group (port 80). Health check “/”.
+
+Step 6: DNS & TLS (Optional)
+- Route 53 record for lms.example.com to ALB. ACM cert for TLS 1.2+.
+
+Step 7: CI/CD
+- Jenkins/GitLab pipeline to lint and package plugins/themes, then roll out by SSM to ASG instances.
+
+Step 8: Monitoring
+- CloudWatch metrics and alarms (e.g., ALB 5XX). Enable logs for access/error.
+
+Step 9: Backups & DR
+- AWS Backup plan for RDS. S3 lifecycle policies for archives. Regular restore drills.
+
+Security Checklist
+- IAM least privilege, no hard-coded secrets (use Secrets Manager).
+- WAF on ALB, security groups locked down, OS patching via AMI pipeline.
+- Session/caching with Redis (ElastiCache) and CloudFront for global performance.
+
+Operations
+- Blue/green via new Launch Template version -> ASG rolling update.
+- Scale policy on ALB RequestCountPerTarget, CPUUtilization.
+
+Troubleshooting
+- 502/504: check target health, container logs, security groups.
+- Moodle install loop: verify DB reachability, correct env vars.
+- Slow UI: enable Redis cache, raise PHP memory limit, use CloudFront.

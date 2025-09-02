@@ -1,0 +1,21 @@
+AWS LMS Engineer – Real-time Project (Moodle on AWS)
+This PDF walks you through a production-grade Moodle deployment on AWS using Terraform and
+Docker. It includes architecture notes, step-by-step setup, security tips, and troubleshooting.
+Architecture (High level)
+- VPC (2 public + 2 private subnets) - ALB + Auto Scaling Group (EC2) running Nginx + Moodle
+container - RDS MySQL (Multi-AZ), S3 for filedir, optional CloudFront, optional Redis -
+CloudWatch for logs/metrics, AWS Backup
+Setup Steps
+1) Clone repository and install Terraform/AWS CLI. 2) Configure AWS credentials. 3) Edit
+terraform.tfvars with region, DB password, instance types. 4) terraform init/plan/apply. 5)
+Open ALB DNS in browser and complete Moodle installer. 6) (Optional) Add Route 53 + ACM for
+HTTPS.
+Security
+• Use Secrets Manager for DB credentials. • Restrict SGs to ALB->EC2 and EC2->DB only. • Attach
+AWS WAF to ALB; enable Shield if public-facing. • Enforce TLS 1.2+, HSTS in Nginx.
+Operations
+• Patch via AMI pipeline or replace Launch Template version. • Autoscale by CPU or ALB request
+count. • Back up DB via AWS Backup; test restores monthly.
+Troubleshooting
+• 5xx on ALB: check target health, Nginx access/error logs. • Install loop: database
+connectivity/env vars. • Slowness: enable Redis, raise PHP memory limit, add CloudFront.

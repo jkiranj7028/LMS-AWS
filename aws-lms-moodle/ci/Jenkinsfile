@@ -1,0 +1,31 @@
+pipeline {
+  agent any
+  options { timestamps() }
+  triggers { pollSCM('@daily') }
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+    stage('Lint Theme/Plugins') {
+      steps {
+        sh 'echo "Run phpcs or linters for Moodle plugins here"'
+      }
+    }
+    stage('Build Artifact') {
+      steps {
+        sh 'tar -czf moodle-plugins.tgz plugins/ || true'
+      }
+    }
+    stage('Deploy via SSM/SSH') {
+      steps {
+        sh '''
+        # Example: rolling restart of Docker service on each EC2 instance via SSM
+        echo "aws ssm send-command --document-name AWS-RunShellScript ..."
+        '''
+      }
+    }
+  }
+  post {
+    always { archiveArtifacts artifacts: 'moodle-plugins.tgz', fingerprint: true }
+  }
+}

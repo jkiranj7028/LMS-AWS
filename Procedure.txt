@@ -1,0 +1,17 @@
+Awesome — I’ve bundled a complete, production-style AWS LMS (Moodle) project with Terraform, Docker bootstrap, CI/CD examples, monitoring, backups, and a step-by-step PDF guide.
+
+What’s inside (quick tour)
+•	Terraform: VPC (2 AZs), ALB, Auto Scaling EC2 (Dockerized Moodle behind Nginx), RDS MySQL (Multi-AZ), S3 (filedir), IAM, CloudWatch example alarms, AWS Backup example.
+•	Bootstrap: userdata.sh installs Docker, brings up Moodle (Bitnami) + Nginx reverse proxy.
+•	CI/CD: sample Jenkinsfile and gitlab-ci.yml to lint/package plugins/themes and roll out via SSM/SSH.
+•	Docs: quick-start README and a printable PDF guide.
+
+How to use (super short)
+1.	Install Terraform & AWS CLI, then aws configure.
+2.	Edit terraform/terraform.tfvars.example → save as terraform/terraform.tfvars.
+3.	Run:
+cd terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+4.	Open the ALB DNS from terraform outputs in your browser and finish Moodle’s installer.

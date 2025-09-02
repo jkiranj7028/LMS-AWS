@@ -1,0 +1,18 @@
+stages: [lint, build, deploy]
+
+lint:
+  stage: lint
+  script:
+    - echo "Run moodle plugin/theme linting"
+
+build:
+  stage: build
+  script:
+    - tar -czf moodle-plugins.tgz plugins/ || true
+  artifacts:
+    paths: [moodle-plugins.tgz]
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Use AWS CLI/SSM to rollout containers to EC2 instances"
